@@ -11,3 +11,7 @@ There's not much difficulty to convert to old vrp or "vrpex", You can read the [
 * ✅ Dynamic Collection System: All map dumps are automatically identified and added to this script, without the need for any manual work.
 * ✅ Uniform System: To start the job the player needs to wear the uniform with an already defined set that currently uses the standard clothes, and automatically recognizes the character's gender.
 * ✅ Garage system: The script has its own garage system without needing any additional dependencies for vehicles.
+
+## Dependencies
+
+It's necessary to use the [Qtarget](https://github.com/overextended/qtarget) to interact with the objects
