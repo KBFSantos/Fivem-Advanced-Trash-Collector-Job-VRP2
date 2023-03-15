@@ -9,7 +9,7 @@ There's not much difficulty to convert to old vrp or "vrpex", You can read the [
 * ✅ Smooth Animations: This script uses a better set of animations than any other script, with smooth transitions and animations.
 * ✅ Global Cooldown System: Each garbage can collected has a cooldown for another player to collect it. (Gta's rendering system included in fivem causes object instances to change depending on distance which makes it difficult to store cooldown times on objects. This script dynamically stores the cooldown time of each collected dump, affecting all players on the server.)
 * ✅ Dynamic Collection System: All dumps on map are automatically identified and added to this script, without the need for any manual work.
-* ✅ Uniform System: To start the job the player needs to wear the uniform with an already defined set that currently uses the standard clothes, and automatically recognizes the character's gender.
+* ✅ Uniform System: To start the job the player needs to wear the uniform with an already defined set that currently uses the standard garbage collector's outfit, and automatically recognizes the character's gender.
 * ✅ Garage system: The script has its own garage system without needing any additional dependencies for vehicles.
 * ✅ Random Item Chance: It's possible to set a random chance of finding some item while collecting garbage.
 * ✅ Safe Communication: The script uses vrp tunnel for server communications in essential functions to prevent hacker exploitation using triggers, This can prevent money hacks for example.
