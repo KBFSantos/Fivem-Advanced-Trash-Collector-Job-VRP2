@@ -12,6 +12,7 @@ There's not much difficulty to convert to old vrp or "vrpex", You can read the [
 * ✅ Uniform System: To start the job the player needs to wear the uniform with an already defined set that currently uses the standard clothes, and automatically recognizes the character's gender.
 * ✅ Garage system: The script has its own garage system without needing any additional dependencies for vehicles.
 * ✅ Random Item Chance: It's possible to set a random chance of finding some item while collecting garbage.
+* ✅ Secure Communication: The script uses vrp tunnel for server communications in essential functions to prevent hacker exploitation using triggers, This can prevent money hacks for example.
 
 ## Dependencies
 
