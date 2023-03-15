@@ -1,6 +1,6 @@
 # Fivem Advanced Trash Collector Job (VRP2)
 
-Fivem advanced garbage collector job script with several features, Currently using the [VRP2 framework](https://github.com/vRP-framework/vRP).
+Currently using the [VRP2 framework](https://github.com/vRP-framework/vRP).
 
 There's not much difficulty to convert to old vrp or "vrpex", You can read the [VRP2 Documentation](https://vrp-framework.github.io/vRP/dev/index.html) and convert on your own (I don't support converting this script).
 
