@@ -16,9 +16,10 @@ end
 
 local garbagetrucks = {}
 local dumpsters = {}
-local lixoPrice = 20
+local trashPrice = 20
 
-local residuos = {
+-- list of waste materials that can be found when collecting a bag of garbage and chance of obtaining them
+local waste = {
     {name = "reciclagem",chance=7},
     {name = "fvq",chance=4},
     {name = "benzedrina",chance=2},
@@ -49,8 +50,8 @@ function vrp_lixeiro.tunnel:setDumpster(pos,timer)
     table.insert(dumpsters,{pos=pos,timer=timer})
 end
 
-RegisterServerEvent("vrp_lixeiro:ColocarLixo")
-AddEventHandler("vrp_lixeiro:ColocarLixo",function(val,nvehid)
+RegisterServerEvent("vrp_lixeiro:PutTrashInTruck")
+AddEventHandler("vrp_lixeiro:PutTrashInTruck",function(val,nvehid)
     local source = source
     local user = vRP.users_by_source[source]
     local garbageIndex = nil
@@ -71,7 +72,7 @@ AddEventHandler("vrp_lixeiro:ColocarLixo",function(val,nvehid)
         table.insert(garbagetrucks[nvehid],{char=user.cid,lixos=val})
     end
 
-    for i,v in pairs(residuos) do
+    for i,v in pairs(waste) do
         if randomTrashChance(v.chance)  then
             user:tryGiveItem(v.name, math.random(1,5))
             TriggerClientEvent("Notify",user.source,"importante","Você encontrou algo no saco de lixo")
@@ -80,8 +81,8 @@ AddEventHandler("vrp_lixeiro:ColocarLixo",function(val,nvehid)
      end
 end)
 
-RegisterServerEvent("vrp_lixeiro:EntregarLixo")
-AddEventHandler("vrp_lixeiro:EntregarLixo",function(nvehid)
+RegisterServerEvent("vrp_lixeiro:DumpTrash")
+AddEventHandler("vrp_lixeiro:DumpTrash",function(nvehid)
     local source = source
     local user = vRP.users_by_source[source]
     
@@ -90,7 +91,7 @@ AddEventHandler("vrp_lixeiro:EntregarLixo",function(nvehid)
         for i,v in pairs(garbagetrucks[nvehid]) do
             local player = vRP.users_by_cid[v.char]
             if player then
-                local reward = v.lixos*lixoPrice
+                local reward = v.lixos*trashPrice
                 player:giveWallet(reward)
                 TriggerClientEvent("Notify",player.source,"importante","Você recebeu <b>$"..reward.."</b> pela coleta de lixo")
             end
@@ -103,8 +104,8 @@ AddEventHandler("vrp_lixeiro:EntregarLixo",function(nvehid)
     end
 end)
 
-RegisterServerEvent("vrp_lixeiro:Uniforme")
-AddEventHandler("vrp_lixeiro:Uniforme",function(value,sex)
+RegisterServerEvent("vrp_lixeiro:Uniform")
+AddEventHandler("vrp_lixeiro:Uniform",function(value,sex)
     local source = source
     local user = vRP.users_by_source[source]
     if not sex or not value then
