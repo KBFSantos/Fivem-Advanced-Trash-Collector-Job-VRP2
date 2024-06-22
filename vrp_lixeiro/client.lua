@@ -179,7 +179,7 @@ Citizen.CreateThread(function()
                                         TriggerEvent("cancelando", false)
                                         SetVehicleDoorShut(vehicleHandle,5)
                                         ClearPedTasks(ped)
-                                        TriggerServerEvent("vrp_lixeiro:ColocarLixo",1,NetworkGetNetworkIdFromEntity(vehicleHandle))
+                                        TriggerServerEvent("vrp_lixeiro:PutTrashInTruck",1,NetworkGetNetworkIdFromEntity(vehicleHandle))
                                     end
                                 end
                     end
@@ -210,7 +210,7 @@ Citizen.CreateThread(function()
                         DisplayHelpText("Pressione ~INPUT_PICKUP~ para descarregar lixo")
                         if IsControlJustPressed(1,38) then
                             local car = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-                            TriggerServerEvent("vrp_lixeiro:EntregarLixo",NetworkGetNetworkIdFromEntity(car))
+                            TriggerServerEvent("vrp_lixeiro:DumpGarbage",NetworkGetNetworkIdFromEntity(car))
                         end
                     end
                 end
@@ -327,9 +327,9 @@ AddEventHandler("vrp_lixeiro:Job",function(data)
         Citizen.Wait(10)
         end
         if IsMale(PlayerPedId()) then
-            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniforms["male"])
+            TriggerServerEvent("vrp_lixeiro:Uniform",true,uniforms["male"])
         else
-            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniforms["female"])
+            TriggerServerEvent("vrp_lixeiro:Uniform",true,uniforms["female"])
         end
         Citizen.Wait(150)
         DoScreenFadeIn(250)
@@ -345,7 +345,7 @@ AddEventHandler("vrp_lixeiro:Job",function(data)
         while not IsScreenFadedOut() do
         Citizen.Wait(10)
         end
-        TriggerServerEvent("vrp_lixeiro:Uniforme",false)
+        TriggerServerEvent("vrp_lixeiro:Uniform",false)
         Citizen.Wait(150)
         DoScreenFadeIn(250)
         TriggerEvent("Notify","importante","Você se demitiu do serviço")
@@ -381,12 +381,12 @@ AddEventHandler("vrp_lixeiro:PickupDumpsterTrash",function(data)
         end
         TaskPlayAnim(PlayerPedId(-1), 'anim@heists@narcotics@trash', 'pickup', 1.0, -1.0,-1,50,0,0, 0,0)
         Citizen.Wait(600)
-        local lixo = CreateObject(GetHashKey("hei_prop_heist_binbag"), 0, 0, 0, true, true, true)
-        AttachEntityToEntity(lixo, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.12, 0.0, 0.00, 25.0, 270.0, 180.0, true, true, false, true, 1, true)
+        local newTrashBag = CreateObject(GetHashKey("hei_prop_heist_binbag"), 0, 0, 0, true, true, true)
+        AttachEntityToEntity(newTrashBag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.12, 0.0, 0.00, 25.0, 270.0, 180.0, true, true, false, true, 1, true)
         
         TaskPlayAnim(PlayerPedId(-1), 'anim@heists@narcotics@trash', 'walk', 1.0, -1.0,-1,50,0,0, 0,0)
         TriggerEvent("cancelando", true)
-        carryBag = NetworkGetNetworkIdFromEntity(lixo)
+        carryBag = NetworkGetNetworkIdFromEntity(newTrashBag)
         isCarryingBag = true
     end
 end)
