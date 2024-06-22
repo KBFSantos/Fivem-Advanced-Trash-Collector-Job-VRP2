@@ -4,13 +4,13 @@ Proxy = module("vrp","lib/Proxy")
 local cvRP = module("vrp", "client/vRP")
 vRP = cvRP() 
 
-local trabalhando = false
-local carregandoBag = false
+local isWorking = false
+local isCarryingBag = false
 local carryBag = nil
 local selfTruck = nil
-local descarregarBlip =  nil
+local dumpingSpotBlip =  nil
 
-local uniformes = {
+local uniforms = {
     ["male"] = {
         ["drawable:1"] = {0,0},
         ["drawable:8"] = {59,0},
@@ -90,12 +90,12 @@ Citizen.CreateThread(function()
 	}, {
 		options = {
 			{
-				event = "vrp_lixeiro:trabalhar",
+				event = "vrp_lixeiro:Job",
 				icon = "fas fa-file-signature",
-				label = "Trabalhar",
-                trabalho = true,
+				label = "Work",
+                job = true,
                 canInteract = function(entity)
-                    if not trabalhando then
+                    if not isWorking then
                         return true
                     else
                         return false
@@ -105,10 +105,10 @@ Citizen.CreateThread(function()
             {
 				event = "vrp_lixeiro:spawntruck",
 				icon = "fas fa-truck",
-				label = "Retirar Caminhão",
-                trabalho = false,
+				label = "Take Truck",
+                job = false,
                 canInteract = function(entity)
-                    if trabalhando and not selfTruck then
+                    if isWorking and not selfTruck then
                         return true
                     else
                         return false
@@ -116,12 +116,12 @@ Citizen.CreateThread(function()
                 end,
 			},
             {
-				event = "vrp_lixeiro:trabalhar",
+				event = "vrp_lixeiro:Job",
 				icon = "fas fa-file-signature",
-				label = "Demitir-se",
-                trabalho = false,
+				label = "Resign",
+                job = false,
                 canInteract = function(entity)
-                    if trabalhando then
+                    if isWorking then
                         return true
                     else
                         return false
@@ -145,7 +145,7 @@ Citizen.CreateThread(function()
         local ped = PlayerPedId()	
 
 
-            if carregandoBag then
+            if isCarryingBag then
                 -- check anim
                 if not IsEntityPlayingAnim(ped, 'anim@heists@narcotics@trash', 'walk', 3) then
                     if not HasAnimDictLoaded("anim@heists@narcotics@trash") then
@@ -171,7 +171,7 @@ Citizen.CreateThread(function()
                                     SetVehicleDoorOpen(vehicleHandle,5,0,false)
                                     DisplayHelpText("Pressione ~INPUT_PICKUP~ Para Colocar Lixo")
                                     if IsControlJustPressed(1,38) then
-                                        carregandoBag = false
+                                        isCarryingBag = false
                                         ClearPedTasksImmediately(GetPlayerPed(-1))
                                         TaskPlayAnim(GetPlayerPed(-1), 'anim@heists@narcotics@trash', 'throw_b', 1.0, -1.0,-1,2,0,0, 0,0)
                                         Citizen.Wait(800)
@@ -203,7 +203,7 @@ Citizen.CreateThread(function()
 
             end
 
-            if trabalhando then
+            if isWorking then
                 if IsVehicleModel(GetVehiclePedIsIn(ped,false),GetHashKey("trash2"))then
                     local distance = GetDistanceBetweenCoords(GetEntityCoords(GetPlayerPed(-1)),-328.60488891602,-1522.8067626953,27.53413772583)
                     if distance <= 10 then
@@ -225,9 +225,9 @@ function DisplayHelpText(str)
 	DisplayHelpTextFromStringLabel(0,0,1,-1)
 end
 
-RegisterNetEvent("vrp_lixeiro:PegarLixo")
-AddEventHandler("vrp_lixeiro:PegarLixo",function(data)
-    if not carregandoBag then
+RegisterNetEvent("vrp_lixeiro:PickupTrashBag")
+AddEventHandler("vrp_lixeiro:PickupTrashBag",function(data)
+    if not isCarryingBag then
         NetworkRegisterEntityAsNetworked(data.entity)
         local netid = NetworkGetNetworkIdFromEntity(data.entity)
         if not HasAnimDictLoaded("anim@heists@narcotics@trash") then
@@ -245,7 +245,7 @@ AddEventHandler("vrp_lixeiro:PegarLixo",function(data)
         TaskPlayAnim(PlayerPedId(-1), 'anim@heists@narcotics@trash', 'walk', 1.0, -1.0,-1,50,0,0, 0,0)
         TriggerEvent("cancelando", true)
         carryBag = NetworkGetNetworkIdFromEntity(lixo)
-        carregandoBag = true
+        isCarryingBag = true
     end
 end)
 
@@ -281,66 +281,66 @@ AddEventHandler('vrp_lixeiro:spawntruck',function()
     end
 end)
 
-RegisterNetEvent("vrp_lixeiro:trabalhar")
-AddEventHandler("vrp_lixeiro:trabalhar",function(data)
-    if data.trabalho and not trabalhando then
-        trabalhando = true
+RegisterNetEvent("vrp_lixeiro:Job")
+AddEventHandler("vrp_lixeiro:Job",function(data)
+    if data.job and not isWorking then
+        isWorking = true
 
-        -- blip
-        descarregarBlip = AddBlipForCoord(-328.60488891602,-1522.8067626953,27.53413772583)
-        SetBlipSprite(descarregarBlip,642)
-        SetBlipColour(descarregarBlip,4)
-        SetBlipScale(descarregarBlip,0.7)
-        SetBlipAsShortRange(descarregarBlip,false)
-        SetBlipRoute(descarregarBlip,false)
+        -- creating blip
+        dumpingSpotBlip = AddBlipForCoord(-328.60488891602,-1522.8067626953,27.53413772583)
+        SetBlipSprite(dumpingSpotBlip,642)
+        SetBlipColour(dumpingSpotBlip,4)
+        SetBlipScale(dumpingSpotBlip,0.7)
+        SetBlipAsShortRange(dumpingSpotBlip,false)
+        SetBlipRoute(dumpingSpotBlip,false)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentString("Descarregar Caminhão")
-        EndTextCommandSetBlipName(descarregarBlip)
+        EndTextCommandSetBlipName(dumpingSpotBlip)
         
-        -- pegar sacos de lixo
+        -- enabling trash pickup interaction
         exports['qtarget']:AddTargetModel(bagProps, {
             options = {
                 {
-                    event = "vrp_lixeiro:PegarLixo",
+                    event = "vrp_lixeiro:PickupTrashBag",
                     icon = "fas fa-trash",
-                    label = "Pegar Lixo",
+                    label = "Pickup Trash",
                 },
             },
             distance = 2.0
         })
 
-        -- pegar lixos da lixeira
+        -- Enable Dumpster interaction
         exports['qtarget']:AddTargetModel(dumpsterProp, {
             options = {
                 {
-                    event = "vrp_lixeiro:PegarDumpsterLixo",
+                    event = "vrp_lixeiro:PickupDumpsterTrash",
                     icon = "fas fa-trash",
-                    label = "Pegar Lixo",
+                    label = "Pickup Trash",
                 },
             },
             distance = 2.0
         })
 
-        -- setar uniforme
+        -- applying uniform
         DoScreenFadeOut(250)
         while not IsScreenFadedOut() do
         Citizen.Wait(10)
         end
         if IsMale(PlayerPedId()) then
-            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniformes["male"])
+            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniforms["male"])
         else
-            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniformes["female"])
+            TriggerServerEvent("vrp_lixeiro:Uniforme",true,uniforms["female"])
         end
         Citizen.Wait(150)
         DoScreenFadeIn(250)
         TriggerEvent("Notify","importante","Você foi contratado para trabalhar como <b>lixeiro</b>")
-    elseif not data.trabalho and trabalhando then
-        trabalhando = false
+    elseif not data.job and isWorking then
+        isWorking = false
         exports['qtarget']:RemoveTargetModel(bagProps,{"Pegar Lixo"})
         exports['qtarget']:RemoveTargetModel(dumpsterProp,{"Pegar Lixo"})
-        RemoveBlip(descarregarBlip)
+        RemoveBlip(dumpingSpotBlip)
 
-        -- retira uniforme
+        -- removing uniform
         DoScreenFadeOut(250)
         while not IsScreenFadedOut() do
         Citizen.Wait(10)
@@ -364,9 +364,9 @@ end
 function vrp_lixeiro:__construct()
 	vRP.Extension.__construct(self)
 
-RegisterNetEvent("vrp_lixeiro:PegarDumpsterLixo")
-AddEventHandler("vrp_lixeiro:PegarDumpsterLixo",function(data)
-    if not carregandoBag then
+RegisterNetEvent("vrp_lixeiro:PickupDumpsterTrash")
+AddEventHandler("vrp_lixeiro:PickupDumpsterTrash",function(data)
+    if not isCarryingBag then
             if self.remote.IsDumpsterEmpty(GetEntityCoords(data.entity)) then 
                 TriggerEvent("Notify","aviso","Esta lixeira esta vazia")
                 return
@@ -387,7 +387,7 @@ AddEventHandler("vrp_lixeiro:PegarDumpsterLixo",function(data)
         TaskPlayAnim(PlayerPedId(-1), 'anim@heists@narcotics@trash', 'walk', 1.0, -1.0,-1,50,0,0, 0,0)
         TriggerEvent("cancelando", true)
         carryBag = NetworkGetNetworkIdFromEntity(lixo)
-        carregandoBag = true
+        isCarryingBag = true
     end
 end)
 
